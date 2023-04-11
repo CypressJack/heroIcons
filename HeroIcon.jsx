@@ -1,5 +1,40 @@
 import { useEffect, useState } from 'react';
-import NewHeroIcon from './NewHeroIcon';
+const React = require('react');
+
+function Render({ title, titleId, outline, path, ...props }, svgRef) {
+  return React.createElement(
+    'svg',
+    Object.assign(
+      {
+        xmlns: 'http://www.w3.org/2000/svg',
+        fill: 'none',
+        viewBox: '0 0 24 24',
+        strokeWidth: 1.5,
+        stroke: 'currentColor',
+        'aria-hidden': 'true',
+        ref: svgRef,
+        'aria-labelledby': titleId,
+      },
+      props
+    ),
+    title
+      ? React.createElement(
+          'title',
+          {
+            id: titleId,
+          },
+          title
+        )
+      : null,
+    React.createElement('path', {
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+      d: path,
+    })
+  );
+}
+
+const RenderHeroIcon = React.forwardRef(Render);
 
 // Allows you to dynamically show a Hero Icon (https://heroicons.com/) rather than having to manually import each icon component. You pass in the icon name as a prop, using the name as it is shown on their website rather than the component name which is different (eg. "archive" == "ArchiveIcon" component) -- abstracts away that complexity for you.
 export default function HeroIcon({
@@ -11,14 +46,14 @@ export default function HeroIcon({
   if (!icon) return <></>;
   const [theIcon, setTheIcon] = useState({ d: '' });
   useEffect(() => {
-    fetch(`/heroIcons/outline/${icon}.json`, {cache: 'force-cache'})
+    fetch(`/heroIcons/outline/${icon}.json`, { cache: 'force-cache' })
       .then((response) => response.json())
       .then((icon) => {
         setTheIcon(icon);
       });
   }, []);
   return (
-    <NewHeroIcon
+    <RenderHeroIcon
       outline={outline}
       path={theIcon.d}
       className={className}
